@@ -2,6 +2,8 @@ import { z } from 'zod';
 import bcrypt from "bcrypt";
 import { UserModel } from '../models/userModel.js';
 import type { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { env } from '../env.js';
 
 export async function registerUser(req : Request, res : Response){
     const requiredBody = z.object({
@@ -54,4 +56,65 @@ export async function registerUser(req : Request, res : Response){
 
     
 
+}
+
+export async function loginUser(req: Request, res: Response){
+    const requiredBody = z.object({
+        email : z.email().trim(),
+        password : z.string().min(6).max(20)
+    })
+
+    const parsedBody = requiredBody.safeParse(req.body)
+
+    if(!parsedBody.success){
+        res.status(400).json({
+            message : "Invalid Format!",
+            error : parsedBody.error.issues
+        });
+        return;
+    }
+    try{
+        const {email, password} = parsedBody.data;
+        const trimmedEmail = email.trim().toLowerCase()
+        const existingUser = await UserModel.findOne({
+            email : trimmedEmail
+        })
+        if(!existingUser){
+            res.status(401).json({
+                message: "Invalid Username/Password"
+            });
+            return;
+        }  
+        
+        const passwordMatch = await bcrypt.compare(password, existingUser.password);
+        if(!passwordMatch){
+            res.status(401).json({
+            message:"Invalid Username/Password"
+            });
+            return;
+        }else{
+            const token = jwt.sign(
+                { id: existingUser._id },
+                env.JWT_SECRET,
+                { expiresIn: "2h" }
+            );
+
+            res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,        // true in production
+            sameSite: "lax",
+            maxAge: 2 * 60 * 60 * 1000 // 2 hours
+            });
+
+            res.status(200).json({
+            message: "User Login Successful"
+            });
+        }
+        }catch(e){
+        res.status(500).json({
+            message : "Server Error!"
+        })
+        console.log(e)
+    }
+    
 }
