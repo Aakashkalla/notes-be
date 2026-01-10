@@ -1,7 +1,6 @@
-import dotenv from 'dotenv'
-dotenv.config();
 import express from "express";
-import mongoose from "mongoose";
+import { connectDB } from './db.js';
+
 
 const app = express();
 app.use(express.json());
@@ -11,16 +10,6 @@ app.get('/', (req,res) => {
         message : "Hello From Get"
     })
 })
-
-async function connectDB(){
-    try{
-        await mongoose.connect(process.env.MONGODB_URL!);
-        console.log("DB Connected");
-    }catch(e){
-        console.log(e);
-        throw new Error;
-    }
-}
 
 async function serverStart(){
     try{
