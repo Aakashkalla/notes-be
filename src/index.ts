@@ -1,16 +1,13 @@
 import express from "express";
 import { connectDB } from './db.js';
 import cookieParser from "cookie-parser";
+import { authRouter } from "./routes/auth.routes.js";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.get('/', (req,res) => {
-    res.json({
-        message : "Hello From Get"
-    })
-})
+app.use('/auth',authRouter)
 
 async function serverStart(){
     try{
