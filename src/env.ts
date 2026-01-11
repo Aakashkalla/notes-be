@@ -6,7 +6,7 @@ const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     MONGODB_URL: z.string().url().nonempty(), 
     PORT: z.coerce.number().default(3000), 
-    JWT_SECRET:z.string()
+    JWT_SECRET:z.string().min(10)
 });
 export type EnvSchemaType = z.infer<typeof envSchema>;
 
