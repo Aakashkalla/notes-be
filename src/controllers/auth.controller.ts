@@ -101,7 +101,7 @@ export async function loginUser(req: Request, res: Response){
 
             res.cookie("token", token, {
             httpOnly: true,
-            secure: false,        // true in production
+            secure: false,        // true in prod
             sameSite: "lax",
             maxAge: 2 * 60 * 60 * 1000 // 2 hours
             });
@@ -147,4 +147,17 @@ export async function getCurrentUser(req:Request, res:Response){
         });
         console.log(e)
     }
+}
+
+export function logoutUser(req:Request, res:Response){
+    res.clearCookie("token", {
+        httpOnly : true,
+        sameSite : "lax",
+        secure : false // true in prod
+    });
+
+    res.status(200).json({
+        message : "Logout Successfull"
+    })
+
 }
