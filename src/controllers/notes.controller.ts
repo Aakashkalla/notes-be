@@ -49,3 +49,23 @@ export async function createNote(req:Request, res:Response) {
         console.log(e);
     }
 }
+
+export async function getNotes(req:Request, res:Response){
+    const userId = req.userId
+    if(!userId){
+        return res.status(401).json({
+            message : "Unauthorized"
+        })
+    }
+    try{
+        const notes = await NoteModel.find({userId})
+        res.status(200).json({
+            notes
+        })
+    }catch(e){
+        res.status(500).json({
+            message : 'Server Error!'
+        });
+        console.log(e)
+    }
+}
