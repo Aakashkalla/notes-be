@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 interface Note{
     title : string
     content : string
-    userId : Schema.Types.ObjectId
+    userId : mongoose.Types.ObjectId
 
 }
 
